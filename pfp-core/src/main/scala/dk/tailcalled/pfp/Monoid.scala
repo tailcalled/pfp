@@ -17,10 +17,17 @@ trait MonoidOps {
 		def append(m: F[M], n: F[M]) = (monoid.append _).on(m, n)
 		val unit = monoid.unit.point[F]
 	}
-	implicit def vectorMonoid[A]: Monoid[Vector[A]] = new VectorMonoid[A]
-	class VectorMonoid[A] extends Monoid[Vector[A]] {
-		def append(m: Vector[A], n: Vector[A]) = m ++ n
-		val unit = Vector()
+	implicit def vectorFreeMonoid: Free[Monoid, Vector] = new VectorFreeMonoid
+	class VectorFreeMonoid extends Free[Monoid, Vector] {
+		def inst[A]: Monoid[Vector[A]] = new Monoid[Vector[A]] {
+			def append(m: Vector[A], n: Vector[A]) = m ++ n
+			val unit = Vector()
+		}
+		def functor: Functor[Vector] = new Functor[Vector] {
+			def lift[A, B](f: A => B): Vector[A] => Vector[B] = (v) => v.map(f)
+		}
+		def lift[A](x: A): Vector[A] = Vector(x)
+		def lower[A](v: Vector[A])(implicit m: Monoid[A]): A = v.foldLeft(m.unit)(_ ++ _)
 	}
 	implicit object UnitMonoid extends Monoid[Unit] {
 		def append(m: Unit, n: Unit) = ()
@@ -30,6 +37,15 @@ trait MonoidOps {
 	class PairMonoid[A, B](implicit a: Monoid[A], b: Monoid[B]) extends Monoid[(A, B)] {
 		def append(m: (A, B), n: (A, B)) = (m._1 ++ n._1, m._2 ++ n._2)
 		val unit = (a.unit, b.unit)
+	}
+
+	implicit def leftUnitCanonical[A, B, C]
+		(implicit canonical: Canonical[A, B], monoid: Monoid[C]): Canonical[A, (B, C)] = new Canonical[A, (B, C)] {
+		def apply(a: A) = (canonical(a), unit[C])
+	}
+	implicit def rightUnitCanonical[A, B, C]
+		(implicit canonical: Canonical[A, C], monoid: Monoid[B]): Canonical[A, (B, C)] = new Canonical[A, (B, C)] {
+		def apply(a: A) = (unit[B], canonical(a))
 	}
 
 }
