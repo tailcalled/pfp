@@ -11,9 +11,9 @@ trait Monoid[M] extends Semigroup[M] {
 trait MonoidOps {
 	def unit[A](implicit monoid: Monoid[A]) = monoid.unit
 
-	implicit def monoidFromMonoidal[F[_], M]
+	implicit def monoidFromMonoidal[F[+_], M]
 		(implicit monoidal: Monoidal[F], monoid: Monoid[M]): Monoid[F[M]] = new MonoidFromMonoidal
-	class MonoidFromMonoidal[F[_], M](implicit monoidal: Monoidal[F], monoid: Monoid[M]) extends Monoid[F[M]] {
+	class MonoidFromMonoidal[F[+_], M](implicit monoidal: Monoidal[F], monoid: Monoid[M]) extends Monoid[F[M]] {
 		def append(m: F[M], n: F[M]) = (monoid.append _).on(m, n)
 		val unit = monoid.unit.point[F]
 	}
@@ -37,15 +37,6 @@ trait MonoidOps {
 	class PairMonoid[A, B](implicit a: Monoid[A], b: Monoid[B]) extends Monoid[(A, B)] {
 		def append(m: (A, B), n: (A, B)) = (m._1 ++ n._1, m._2 ++ n._2)
 		val unit = (a.unit, b.unit)
-	}
-
-	implicit def leftUnitCanonical[A, B, C]
-		(implicit canonical: Canonical[A, B], monoid: Monoid[C]): Canonical[A, (B, C)] = new Canonical[A, (B, C)] {
-		def apply(a: A) = (canonical(a), unit[C])
-	}
-	implicit def rightUnitCanonical[A, B, C]
-		(implicit canonical: Canonical[A, C], monoid: Monoid[B]): Canonical[A, (B, C)] = new Canonical[A, (B, C)] {
-		def apply(a: A) = (unit[B], canonical(a))
 	}
 
 }

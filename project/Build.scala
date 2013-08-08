@@ -17,7 +17,8 @@ object PfpBuild extends Build {
 		libraryDependencies ++= Seq(Deps.Scalatest, Deps.ScalaReflect)
 	)
 
-	lazy val root = Project("root", file(".")) aggregate core
+	lazy val root = Project("root", file(".")) aggregate (core, modal)
 
 	lazy val core = Project("pfp-core", file("pfp-core"))
+	lazy val modal = Project("pfp-modal", file("pfp-modal")) dependsOn core
 }
