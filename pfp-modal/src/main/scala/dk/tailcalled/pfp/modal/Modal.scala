@@ -27,7 +27,7 @@ trait Modal {
 	}
 
 	sealed trait Events[+A]
-	object Events[A] {
+	object Events {
 		case class Now[+A](now: A, other: Events[A]) extends Events[A]
 		case class Later[+A](later: Next[Events[A]]) extends Events[A]
 	}
