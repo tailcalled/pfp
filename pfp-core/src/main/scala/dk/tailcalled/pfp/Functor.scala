@@ -11,5 +11,6 @@ trait Monoidal[F[+_]] extends Functor[F] {
 	def pair[A, B](a: F[A], b: F[B]): F[(A, B)]
 }
 trait FunctorOps {
-	
+	def lazyPoint[A, F[+_]](a: => A)(implicit monoidal: Monoidal[F]): F[A] =
+		monoidal.unit.fmap(_ => a)
 }
