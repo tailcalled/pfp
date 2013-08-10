@@ -26,6 +26,12 @@ trait Modal {
 		case class Later[+A](later: Next[Eventually[A]]) extends Eventually[A]
 	}
 
+	sealed trait Events[+A]
+	object Events[A] {
+		case class Now[+A](now: A, other: Events[A]) extends Events[A]
+		case class Later[+A](later: Next[Events[A]]) extends Events[A]
+	}
+
 	implicit object SignalInstances extends Monoidal[Signal] with Comonad[Signal] {
 		def lift[A, B](f: A => B): Signal[A] => Signal[B] = {
 			var fLifted: Signal[A] => Signal[B] = null // ugly, but avoids extra allocations
