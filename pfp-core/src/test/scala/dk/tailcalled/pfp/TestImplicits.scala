@@ -10,7 +10,7 @@ class ImplicitsSpecification extends FunSpec {
 		it ("implicitly has instances") {
 			assert(/* there are no */typeErrors("""
 				trait Postulate {
-					type T[_]; type F[_]; type A
+					type T[_]; type F[+_]; type A
 					implicit def free: Free[T, F]
 					implicitly[T[F[A]]]
 				}
@@ -19,7 +19,7 @@ class ImplicitsSpecification extends FunSpec {
 		it ("implicitly is a functor") {
 			assert(/* there are no */typeErrors("""
 				trait Postulate {
-					type T[_]; type F[_]
+					type T[_]; type F[+_]
 					implicit def free: Free[T, F]
 					implicitly[Functor[F]]
 				}
@@ -31,7 +31,7 @@ class ImplicitsSpecification extends FunSpec {
 		it ("sends monoids to monoids") {
 			assert(/* there are no */typeErrors("""
 				trait Postulate {
-					type F[_]; type M
+					type F[+_]; type M
 					implicit def functor: Monoidal[F]
 					implicit def monoid: Monoid[M]
 					implicitly[Monoid[F[M]]]
