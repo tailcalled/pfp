@@ -19,7 +19,7 @@ package object pfp extends MonoidOps with FunctorOps with FreeOps {
 	}
 	implicit class IdOps[A](val u: A) extends AnyVal {
 		def point[F[+_]](implicit monoidal: Monoidal[F]): F[A] = monoidal.point(u)
-		def ++(v: A)(implicit monoid: Monoid[A]) = monoid.append(u, v)
+		def ++(v: A)(implicit monoid: Semigroup[A]) = monoid.append(u, v)
 	}
 	implicit class BooleanOps(val u: Boolean) extends AnyVal {
 		def guard[A](a: A)(implicit monoid: Monoid[A]) = if (u) a else unit[A]
