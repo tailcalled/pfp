@@ -38,7 +38,7 @@ trait Modal {
 			fLifted = (s: Signal[A]) => Signal[B](f(s.now), fLifted.on(s.later))
 			fLifted
 		}
-		val unit: Signal[Unit] =
+		lazy val unit: Signal[Unit] =
 			fix[Signal[Unit]](nextUnit => Signal((), nextUnit))
 		def pair[A, B](a: Signal[A], b: Signal[B]) =
 			Signal[(A, B)]((a.now, b.now), (pair[A, B] _).on(a.later, b.later))
